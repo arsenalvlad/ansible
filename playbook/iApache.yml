@@ -1,0 +1,46 @@
+---
+- hosts: nodes
+  remote_user: ansible
+  vars_files:
+    - ../vars/lesson1.yml
+  
+  tasks: 
+    - name: install Apache
+      yum: 
+        name: httpd
+        state: latest
+
+    - name: start service Apache 
+      service:
+        name: httpd
+        state: started
+
+    - name: service state
+      command: systemctl status httpd
+      register: result
+      ignore_errors: yes
+      
+    - name: Show service state
+      debug:
+        var: result.failed
+    
+    - block:
+
+      - name: start service Apache
+        service:
+          name: firewalld
+          state: started
+
+      - name: open {{port_firewalld}} port
+        firewalld: 
+#          service: http
+          port: "{{port_firewalld}}"
+          permanent: false 
+          state: enabled
+
+      - name: create file
+        copy:
+           content: "Welcome to my web server"
+           dest: "{{path_html}}"
+      when: not result.failed
+###

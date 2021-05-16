@@ -1,0 +1,27 @@
+---
+- hosts: nodes
+  remote_user: ansible
+  vars_files:
+    - ../vars/lesson1.yml
+
+  tasks:
+
+    - name: Remove httpd
+      yum:
+        name: httpd
+        state: absent
+
+    - name: Remove file index.html
+      file:
+        path: "{{path_html}}"
+        state: absent    
+
+    - name: Close 80 port
+      firewalld:
+#        service: http
+        port: "{{port_firewalld}}"
+        permanent: false
+        state: disabled
+#      with_items: 
+#        - "80/tcp"
+#        - "90-9080/tcp"
