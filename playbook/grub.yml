@@ -1,0 +1,17 @@
+---
+- hosts: nodes
+  remote_user: ansible
+  vars_files:
+    - ../vars/lesson1.yml
+
+  tasks:
+  - name: Replace a localhost entry with our own
+    lineinfile:
+      path: /etc/default/grub
+      regexp: '^GRUB_CMDLINE_LINUX='
+      line: GRUB_CMDLINE_LINUX="no_timer_check console=tty0 console=ttyS0,115200n8 net.ifnames=0 biosdevname=0 elevator=noop"
+
+  - name: Grub mkconfig
+    command:  grub2-mkconfig
+###
+
