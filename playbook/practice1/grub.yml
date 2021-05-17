@@ -1,5 +1,5 @@
 ---
-- hosts: node1
+- hosts: nodes
   remote_user: ansible
   vars_files:
     - ../../vars/lesson1.yml
