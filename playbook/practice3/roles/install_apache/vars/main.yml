@@ -1,0 +1,3 @@
+path_html: "/var/www/html/index.html"
+path_grub: "/etc/default/grub"
+port_firewalld: "80/tcp"

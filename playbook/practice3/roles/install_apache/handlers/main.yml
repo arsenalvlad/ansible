@@ -1,0 +1,23 @@
+---
+
+  - name: start apache 
+    service:
+      name: httpd
+      state: started
+
+
+  - name: start firewalld
+    service:
+      name: firewalld
+      state: started  
+
+  - name: restart apache 
+    service:
+      name: httpd
+      state: restarted
+
+
+  - name: restart firewalld
+    service:
+      name: firewalld
+      state: restarted            
