@@ -1,0 +1,68 @@
+---
+- hosts: node1
+  remote_user: ansible
+  vars_files:
+    - ../../vars/lesson1.yml
+
+  tasks:
+  - name: check net.ifnames= in FILE
+    lineinfile:
+      state: absent
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(.*)(net.ifnames=)([0-9]+)(.*)$'
+    ignore_errors: true
+    changed_when: false
+    check_mode: yes      
+    register: pamA  
+
+  - name: check biosdevname= in FILE
+    lineinfile:
+      state: absent
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(.*)(biosdevname=)([0-9]+)(.*)$'
+    ignore_errors: true
+    changed_when: false      
+    check_mode: yes       
+    register: pamB     
+
+  - name: Add or replace net.ifnames=
+    lineinfile:
+      state: present
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(.*)(net.ifnames=)([0-9]+)(.*)$'
+      line: '\g<1>\g<2>\g<3>0\g<5>'
+      backrefs: yes
+    when: pamA.found
+
+  - name: Update or replace biosdevname=
+    lineinfile:
+      create: yes
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(.*)(biosdevname=)([0-9]+)(.*)$'
+      line: '\g<1>\g<2>\g<3>0\g<5>'
+      # backup: yes
+      backrefs: yes
+    when: pamB.found
+
+  - name: Add line net...
+    lineinfile:
+      state: present
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(")(.*)("$)'
+      line: '\g<1>"net.ifnames=0 \g<3>\g<4>'
+      backrefs: yes
+    when: not pamA.found
+
+  - name: Add line bios...
+    lineinfile:
+      state: present
+      path: "{{path_grub}}"
+      regexp: '(^GRUB_CMDLINE_LINUX=*)(")(.*)("$)'
+      line: '\g<1>"biosdevname=0 \g<3>\g<4>'
+      backrefs: yes
+    when: not pamB.found   
+
+  - name: Grub mkconfig
+    command:  grub2-mkconfig
+###
+

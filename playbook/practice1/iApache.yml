@@ -2,7 +2,7 @@
 - hosts: nodes
   remote_user: ansible
   vars_files:
-    - ../vars/lesson1.yml
+    - ../../vars/lesson1.yml
   
   tasks: 
     - name: install Apache
@@ -10,37 +10,37 @@
         name: httpd
         state: latest
 
+    - name: install Firewalld
+      yum: 
+        name: firewalld
+        state: latest
+
     - name: start service Apache 
       service:
         name: httpd
         state: started
 
-    - name: service state
+    - name: service state httpd
       command: systemctl status httpd
       register: result
       ignore_errors: yes
-      
-    - name: Show service state
-      debug:
-        var: result.failed
     
     - block:
 
-      - name: start service Apache
+      - name: start service Firewalld
         service:
           name: firewalld
           state: started
 
       - name: open {{port_firewalld}} port
         firewalld: 
-#          service: http
           port: "{{port_firewalld}}"
           permanent: false 
           state: enabled
 
       - name: create file
         copy:
-           content: "Welcome to my web server"
+           content: 'GRUB_CMDLINE_LINUX="net.ifnames=0 bi6osdevname=0"'
            dest: "{{path_html}}"
       when: not result.failed
 ###

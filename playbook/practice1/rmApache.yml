@@ -2,7 +2,7 @@
 - hosts: nodes
   remote_user: ansible
   vars_files:
-    - ../vars/lesson1.yml
+    - ../../vars/lesson1.yml
 
   tasks:
 
@@ -18,10 +18,7 @@
 
     - name: Close 80 port
       firewalld:
-#        service: http
         port: "{{port_firewalld}}"
         permanent: false
+        immediate: true
         state: disabled
-#      with_items: 
-#        - "80/tcp"
-#        - "90-9080/tcp"
