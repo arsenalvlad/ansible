@@ -40,7 +40,7 @@
 
       - name: create file
         copy:
-           content: 'GRUB_CMDLINE_LINUX="net.ifnames=0 bi6osdevname=0"'
+           content: 'Welcome to my web server'
            dest: "{{path_html}}"
       when: not result.failed
 ###
