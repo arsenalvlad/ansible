@@ -3,47 +3,21 @@
       yum: 
         name: httpd
         state: latest
-      # notify: 
-      #   - start firewalld  
+      notify: 
+        - start apache 
 
     - name: install Firewalld
       yum: 
         name: firewalld
         state: latest
-      # notify: 
-      #   - start apache  
-
-    - name: start apache 
-      service:
-        name: httpd
-        state: started      
-
-    # - name: start firewalld
-    #   service:
-    #     name: firewalld
-    #     state: reloaded
-
-
-    - name: start firewalld
-      service:
-        name: firewalld
-        state: restarted                         
-
-    - name: service state httpd
-      command: systemctl status httpd
-      register: result
-      ignore_errors: yes
-
-      # sudo systemctl enable firewalld.service
+      notify: 
+        - start firewalld                  
     
     - name: open {{port_firewalld}} port
       firewalld: 
         port: "{{port_firewalld}}"
         permanent: false 
         state: enabled
-      # notify: 
-      #   - restart firewalld
-      #   - restart apache    
 
     - name: create file
       copy:

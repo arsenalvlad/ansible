@@ -16,7 +16,6 @@
       name: httpd
       state: restarted
 
-
   - name: restart firewalld
     service:
       name: firewalld
