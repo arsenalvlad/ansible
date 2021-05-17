@@ -1,0 +1,5 @@
+# roles/ftp/vars/main.yml
+---
+
+vsftpd_service: vsftpd
+vsftpd_config_file: /etc/vsftpd/vsftpd.conf

@@ -1,0 +1,11 @@
+---
+
+  - name: restart vsftpd
+    service:
+      name: '{{vsftpd_service}}'
+      state: restarted
+
+  - name: start firewalld
+    service:
+      name: firewalld
+      state: started  

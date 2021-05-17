@@ -1,0 +1,63 @@
+# roles/vsftpd/tasks/main.yml
+---
+
+- name: install vsftpd
+  package: 
+    name: "{{item}}"
+  with_items:
+    - vsftpd
+    - python3-policycoreutils   
+
+- name: Install firewalld
+  yum: 
+    name: firewalld
+    state: latest
+
+- name: open {{port_firewalld}} port
+  firewalld: 
+    service: ftp
+    permanent: false 
+    state: enabled
+
+- name: Create `anon_root`
+  file:
+    path: '{{ vsftpd_anon_root }}'
+    state: directory
+    owner: '{{ vsftpd_owner }}'
+    group: '{{ vsftpd_group }}'
+    mode: '{{ vsftpd_mode }}'
+    setype: '{{ vsftpd_setype }}'
+  when: vsftpd_anonymous_enable
+
+- name: Install configuration file
+  template:
+    src:   ftp.conf.j2
+    dest: "{{ vsftpd_config_file }}"
+    mode: '0600'
+  notify: restart vsftpd
+
+- name: "Set SELinux context for vsftpd to write files."
+  sefcontext:
+    target:   '{{ item }}(/.*)?'
+    setype:   '{{ vsftpd_setype }}'
+    state:    present
+  with_items: '{{ vsftpd_writable_dirs }}'
+  when: vsftpd_write_enable
+
+- name: "Enable the SELinux Boolean: allow_ftpd_anon_write"
+  seboolean:
+    name:       allow_ftpd_anon_write
+    state:      yes
+    persistent: yes
+  when: vsftpd_anon_upload_enable
+
+# - name: restart vsftpd
+#   service:
+#     name: '{{vsftpd_service}}'
+#     state: restarted
+
+- name: Ensure service is started
+  service:
+    name: '{{ vsftpd_service }}'
+    state: started
+    enabled: true
